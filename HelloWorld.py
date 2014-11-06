@@ -8,3 +8,6 @@ print "Jos nesto"
 
 #Program eksplicitno naglasava da mu je ovo zadnja promjena
 print "zadnja promjena"
+
+#dokaz da program laze
+print "jos jedna promjena"
