@@ -546,3 +546,18 @@ for stanja in prijelaziDKA:
 
 print '-----------------------'         
 print NovoStanje
+
+f = open("izlaz.txt", 'w')
+f.write('%A\n')
+for stanje in Akcija:
+    f.write(str(stanje) + '\n')
+    for znak in Akcija[stanje]:
+        f.write(' ' + znak + '\n')
+        f.write(' ' + Akcija[stanje][znak] + '\n')
+        
+f.write('%N\n')
+for stanje in NovoStanje:
+    f.write(str(stanje) + '\n')
+    for znak in NovoStanje[stanje]:
+        f.write(' ' + znak + '\n')
+        f.write(' ' + NovoStanje[stanje][znak] + '\n')
