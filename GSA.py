@@ -1,6 +1,7 @@
 __author__ = 'Mate'
 import sys
 import copy
+from time import sleep
 
 def odvojiZnakove():
     vratiListu = sys.stdin.readline().rstrip().split(' ')
@@ -74,9 +75,16 @@ def napuniZapocinje():
                 Zapocinje[znak].append(okruzenje)
 
 def nadiSlijedeci(stanje, stanjeIz):
+    #print stanje
+    #print stanjeIz
     tocka = nadiTocku(stanjeIz)
     niz = ""
     if(stanjeIz[tocka + len(stanje) + 1] != '<'):
+        if(stanjeIz[tocka + len(stanje) + 1] != ','):
+            pozicija = tocka + len(stanje) + 1
+            while niz not in zavrsniZnakovi:
+                niz += stanjeIz[pozicija]
+                pozicija += 1
         return niz
     for i in range(tocka + len(stanje) + 1, len(stanjeIz)):
         niz += stanjeIz[i]
@@ -123,11 +131,25 @@ def napraviStanje(stanje, stanjeIz):
                 niz = stanje + '->.,{' + okruzenjeIspis + '}'
             else:    
                 slijedeci = nadiSlijedeci(stanje, stanjeIz)
-                if slijedeci in prazniNezZnakovi:
-                    slijedeciOkruzenje = Zapocinje[slijedeci]
-                    for i in slijedeciOkruzenje:
-                        if i not in okruzenje:
-                            okruzenje.append(i)
+                #print stanjeIz
+                #print stanje
+                #print slijedeci
+                if slijedeci != '':
+                    if slijedeci not in prazniNezZnakovi:
+                        """slijedeciOkruzenje = Zapocinje[slijedeci]
+                        for i in slijedeciOkruzenje:
+                            if i not in okruzenje:
+                                okruzenje.append(i)"""
+                        okruzenje = []
+                #print slijedeci
+                    """for znak in nezavrsniZnakovi:
+                        if znak in Zapocinje[slijedeci]:
+                            if znak not in okruzenje:
+                                okruzenje.append(znak)"""
+                    for znak in zavrsniZnakovi:
+                        if znak in Zapocinje[slijedeci]:
+                            if znak not in okruzenje:
+                                okruzenje.append(znak)
                 okruzenjeIspis = ""
                 for i in range(0, len(okruzenje)):
                     if i != len(okruzenje) - 1:
@@ -160,10 +182,17 @@ def pomakniTocku(prijelaz):
     else:
         niz = ""
         i = tocka + 1
-        while niz not in zavrsniZnakovi:
+        #print prijelaz
+        zadnjiDobar = 0
+        while i < len(prijelaz):
             niz += prijelaz[i]
+            if(niz in zavrsniZnakovi):
+                zadnjiDobar = i
             i += 1
-        niz = prijelaz[0:tocka] + prijelaz[tocka+1:i] + '.' + prijelaz[i:len(prijelaz)]
+        niz = prijelaz[tocka+1: zadnjiDobar+1]
+        #print niz
+        niz = prijelaz[0:tocka] + prijelaz[tocka+1:zadnjiDobar+1] + '.' + prijelaz[zadnjiDobar+1:len(prijelaz)]
+        #print niz
         return niz
 
 def nadiZnak(prijelaz):
@@ -218,17 +247,18 @@ def nadiEpsilonOkruzenje(element):
     okruzenje.append(element)
     noviElementi.append(element)
     while len(noviElementi) > 0:
+        #print noviElementi
         for i in range(0, len(noviElementi)):
             if((noviElementi[i] in prijelaziEpsilonNKA) and prijelaziEpsilonNKA[noviElementi[i]].has_key('$')):
                 for j in range(0, len(prijelaziEpsilonNKA[noviElementi[i]]['$'])):
                     if (prijelaziEpsilonNKA[noviElementi[i]]['$'][j] not in prijelazi):
                         prijelazi.append(prijelaziEpsilonNKA[noviElementi[i]]['$'][j])
-        
         noviElementi = []
         for i in range(0, len(prijelazi)):
             if prijelazi[i] not in okruzenje:
                 okruzenje.append(prijelazi[i])
                 noviElementi.append(prijelazi[i])
+    
     
     return okruzenje 
     
@@ -302,7 +332,7 @@ listaStanjaNKA.append(pomStanje)
 pretvori(pomStanje)
 #for i in prijelaziEpsilonNKA['<%>']['$']:
 #    pretvori(i)
-
+#sys.exit(0)
 #print '----------------------------'
 #print listaStanjaNKA
 #print '-    -   -   -   -   -   -   -   -   '
@@ -311,6 +341,17 @@ pretvori(pomStanje)
 #    print i
 #    print prijelaziEpsilonNKA[i]
 
+#print prijelaziEpsilonNKA
+#print '-----------------------------------------'
+#for i in prijelaziEpsilonNKA:
+#    print i
+#print '-------------------------------------------'
+#for i in prijelaziEpsilonNKA:
+#    print prijelaziEpsilonNKA[i]
+#print '--------------------'
+#for i in listaStanjaNKA:
+#    print i
+#print len(listaStanjaNKA)
 
 epsilonOkruzenja = {}
 for stanje in listaStanjaNKA:
@@ -380,8 +421,8 @@ for stanje in prijelaziEpsilonNKA:
     
 #print "- - -- - -- - -- - - -"
 #print prijelaziNKA
+#print len(prijelaziNKA)
 #print "- - -- - -- - -- - - -"
-
 
 prijelaziDKA = {}
 preimenuj = {}
@@ -390,7 +431,12 @@ abc = pomStanje
 pomStanje = '[' + pomStanje + ']'
 novaStanja = [pomStanje]
 #print '------------------------'
+#print 'pocinje'
 while len(novaStanja) > 0:
+    """for x in prijelaziDKA:
+        print x
+    print '-----------------'"""
+    #print prijelaziDKA
     pomLista = []
     for i in range(0, len(novaStanja)):
         if novaStanja[i] not in prijelaziDKA:
@@ -403,26 +449,33 @@ while len(novaStanja) > 0:
         novStanje = novStanje.split('|')
         #novStanje = novStanje[0]
         #print novStanje
-        for z in range(0, len(novStanje)):      
-            for znak in nezavrsniZnakovi:
-                st = ""
+        for znak in nezavrsniZnakovi:
+            listaZaNovaStanja = []
+            st = ""
+            for z in range(0, len(novStanje)):
                 #print novStanje
                 #print znak
                 if novStanje[z] in prijelaziNKA:
                     for j in range(0, len(prijelaziNKA[novStanje[z]][znak])):
                         #print 'tu'
-                        if j == 0:
-                            st += prijelaziNKA[novStanje[z]][znak][j]
-                        else:
-                            st += '|' + prijelaziNKA[novStanje[z]][znak][j]
-                if len(st) > 0:
-                    #print 'tu2'
-                    st = '[' + st + ']'
-                    #print st
-                    prijelaziDKA[novaStanja[i]][znak] = st
-                    if st not in prijelaziDKA:
-                        if st not in pomLista:
-                            pomLista.append(st)
+                        if prijelaziNKA[novStanje[z]][znak][j] not in listaZaNovaStanja:
+                            listaZaNovaStanja.append(prijelaziNKA[novStanje[z]][znak][j])
+                #print st
+            listaZaNovaStanja.sort()
+            for x in range(0, len(listaZaNovaStanja)):
+                if x == 0:
+                    st += listaZaNovaStanja[x]
+                else:
+                    st += '|' + listaZaNovaStanja[x]
+            if len(st) > 0:
+                #print 'tu2'
+                st = '[' + st + ']'
+                #print st
+                prijelaziDKA[novaStanja[i]][znak] = st
+                if st not in prijelaziDKA:
+                    if st not in pomLista:
+                        pomLista.append(st)
+            #print st
     #novaStanja = copy.copy(pomLista)
     #print novaStanja
     
@@ -435,31 +488,52 @@ while len(novaStanja) > 0:
         novStanje = novStanje[1:len(novStanje)-1]
         novStanje = novStanje.split('|')
         #novStanje = novStanje[0]
+        #print '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
         #print novStanje
-        for z in range(0, len(novStanje)):      
-            for znak in zavrsniZnakovi:
-                st = ""
+        for znak in zavrsniZnakovi:
+            listaZaNovaStanja = []
+            st = ""
+            for z in range(0, len(novStanje)):  
                 #print novStanje
                 #print znak
                 if novStanje[z] in prijelaziNKA:
                     for j in range(0, len(prijelaziNKA[novStanje[z]][znak])):
-                        #print 'tu'
-                        if j == 0:
-                            st += prijelaziNKA[novStanje[z]][znak][j]
-                        else:
-                            st += '|' + prijelaziNKA[novStanje[z]][znak][j]
-                if len(st) > 0:
-                    #print 'tu2'
-                    st = '[' + st + ']'
-                    #print st
-                    prijelaziDKA[novaStanja[i]][znak] = st
-                    if st not in prijelaziDKA:
-                        if st not in pomLista:
-                            pomLista.append(st)
+                        if prijelaziNKA[novStanje[z]][znak][j] not in listaZaNovaStanja:
+                            listaZaNovaStanja.append(prijelaziNKA[novStanje[z]][znak][j])
+            listaZaNovaStanja.sort()
+            for x in range(0, len(listaZaNovaStanja)):
+                if x == 0:
+                    st += listaZaNovaStanja[x]
+                else:
+                    st += '|' + listaZaNovaStanja[x]
+            if len(st) > 0:
+                #print 'tu2'
+                st = '[' + st + ']'
+                #print st
+                prijelaziDKA[novaStanja[i]][znak] = st
+                if st not in prijelaziDKA:
+                    #print '1'
+                    if st not in pomLista:
+                        pomLista.append(st)
+            #print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            #print st
     novaStanja = copy.copy(pomLista)
+    """for i in novaStanja:
+        print i
+        print '-------------------------'"""
+    #print '++++++++++++++++++++++++++++++++++++++++++++++++++++'
+    #print len(novaStanja)
+    #sleep(4.0)
 
+#print len(prijelaziDKA)
+#sys.exit(0)
 #print '-----------------------------------'
 #print prijelaziDKA
+#print '---------------------------------'
+#for i in prijelaziDKA:
+#    print i
+#print len(prijelaziDKA)
+
 
 niz = ''
 okruz = epsilonOkruzenja[abc]
@@ -479,11 +553,16 @@ preimenuj.pop(pomStanje, None)
 
 #print prijelaziDKA
 #print '-------------------------'
-for i in prijelaziDKA:
-    print i
+#for i in prijelaziDKA:
+#    print i
   
 #print '- -- - -- - - -------------'
 #print preimenuj
+#for i in preimenuj:
+#    print i
+#    print preimenuj[i]
+#print '--------------------'
+#sys.exit(0)
 
 kopijaPrijelaza = {}
 for stanja in prijelaziDKA:
@@ -529,9 +608,10 @@ for stanja in prijelaziDKA:
                         if pom[len(pom)-1] == '>' and pom[len(pom)-2] == '-':
                            pom += '$'
                         Akcija[novi][znak] = 'Reduciraj(' + str(pom) + ')'
-
+#print len(prijelaziDKA)
+#print preimenuj
 pomStanje = '[<%>->' + pocetniNezavrsni + '.,{#}]'
-tmp = preimenuj[pomStanje]
+tmp = preimenuj[niz]
 Akcija[tmp]['#'] = 'Prihvati()'
 print Akcija
 
@@ -561,3 +641,5 @@ for stanje in NovoStanje:
     for znak in NovoStanje[stanje]:
         f.write(' ' + znak + '\n')
         f.write(' ' + NovoStanje[stanje][znak] + '\n')
+        
+print len(prijelaziDKA)
