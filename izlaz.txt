@@ -1,0 +1,82 @@
+%A
+0
+ a
+ Pomakni(4)
+ #
+ Prihvati()
+ b
+ Pomakni(5)
+1
+ #
+ Reduciraj(<%>-><S>)
+2
+ a
+ Pomakni(8)
+3
+ a
+ Pomakni(4)
+ #
+ Reduciraj(<S>-><B>)
+ b
+ Pomakni(5)
+4
+ a
+ Reduciraj(<A>->a)
+5
+ a
+ Reduciraj(<B>->b)
+ #
+ Reduciraj(<B>->b)
+ b
+ Reduciraj(<B>->b)
+6
+ a
+ Pomakni(4)
+ #
+ Reduciraj(<S>-><A><A>)
+ b
+ Pomakni(5)
+7
+ #
+ Reduciraj(<S>-><B><S>)
+8
+ a
+ Reduciraj(<A>->a)
+ #
+ Reduciraj(<A>->a)
+ b
+ Reduciraj(<A>->a)
+9
+ #
+ Reduciraj(<S>-><A><A><S>)
+%N
+0
+ <S>
+ Stavi(1)
+ <A>
+ Stavi(2)
+ <B>
+ Stavi(3)
+1
+2
+ <A>
+ Stavi(6)
+3
+ <S>
+ Stavi(7)
+ <A>
+ Stavi(2)
+ <B>
+ Stavi(3)
+4
+5
+6
+ <S>
+ Stavi(9)
+ <A>
+ Stavi(2)
+ <B>
+ Stavi(3)
+7
+8
+9

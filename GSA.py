@@ -613,7 +613,8 @@ for stanja in prijelaziDKA:
 pomStanje = '[<%>->' + pocetniNezavrsni + '.,{#}]'
 tmp = preimenuj[niz]
 Akcija[tmp]['#'] = 'Prihvati()'
-print Akcija
+for slot in Akcija.iteritems():
+	print slot
 
 NovoStanje = {}
 for stanja in prijelaziDKA:
@@ -625,7 +626,8 @@ for stanja in prijelaziDKA:
             NovoStanje[novi][znak] = 'Stavi(' + str(pom) + ')'
 
 print '-----------------------'         
-print NovoStanje
+for kejos in NovoStanje.iteritems():
+	print kejos
 
 f = open("izlaz.txt", 'w')
 f.write('%A\n')
