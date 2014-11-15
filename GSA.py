@@ -2,6 +2,7 @@ __author__ = 'Mate'
 import sys
 import copy
 from time import sleep
+import os.path
 
 def odvojiZnakove():
     vratiListu = sys.stdin.readline().rstrip().split(' ')
@@ -121,41 +122,47 @@ def napraviStanje(stanje, stanjeIz):
         for prijelaz in produkcijeGramatike[stanje]:
             prijelaz = prijelaz.replace(" ", "")
             okruzenje = nadiOkruzenje(stanjeIz)
+            #print ')))))))))))))))))))'
+            #print stanje
+            #print prijelaz
+            slijedeci = nadiSlijedeci(stanje, stanjeIz)
+            #print stanjeIz
+            #print stanje
+            #print 'slijedeci:'
+            #print slijedeci
+            if slijedeci != '':
+                if slijedeci not in prazniNezZnakovi:
+                    """slijedeciOkruzenje = Zapocinje[slijedeci]
+                    for i in slijedeciOkruzenje:
+                        if i not in okruzenje:
+                            okruzenje.append(i)"""
+                    okruzenje = []
+            #print slijedeci
+                    #print 'okruzenje:'
+                    #print okruzenje
+                """for znak in nezavrsniZnakovi:
+                    if znak in Zapocinje[slijedeci]:
+                        if znak not in okruzenje:
+                            okruzenje.append(znak)"""
+                for znak in zavrsniZnakovi:
+                    if znak in Zapocinje[slijedeci]:
+                        if znak not in okruzenje:
+                            okruzenje.append(znak)
+            okruzenjeIspis = ""
+            for i in range(0, len(okruzenje)):
+                if i != len(okruzenje) - 1:
+                    okruzenjeIspis += okruzenje[i] + ','
+                else:
+                    okruzenjeIspis += okruzenje[i]
             if prijelaz == '$':
-                okruzenjeIspis = ""
+                """okruzenjeIspis = ""
                 for i in range(0, len(okruzenje)):
                     if i != len(okruzenje) - 1:
                         okruzenjeIspis += okruzenje[i] + ','
                     else:
-                        okruzenjeIspis += okruzenje[i]
+                        okruzenjeIspis += okruzenje[i]"""
                 niz = stanje + '->.,{' + okruzenjeIspis + '}'
             else:    
-                slijedeci = nadiSlijedeci(stanje, stanjeIz)
-                #print stanjeIz
-                #print stanje
-                #print slijedeci
-                if slijedeci != '':
-                    if slijedeci not in prazniNezZnakovi:
-                        """slijedeciOkruzenje = Zapocinje[slijedeci]
-                        for i in slijedeciOkruzenje:
-                            if i not in okruzenje:
-                                okruzenje.append(i)"""
-                        okruzenje = []
-                #print slijedeci
-                    """for znak in nezavrsniZnakovi:
-                        if znak in Zapocinje[slijedeci]:
-                            if znak not in okruzenje:
-                                okruzenje.append(znak)"""
-                    for znak in zavrsniZnakovi:
-                        if znak in Zapocinje[slijedeci]:
-                            if znak not in okruzenje:
-                                okruzenje.append(znak)
-                okruzenjeIspis = ""
-                for i in range(0, len(okruzenje)):
-                    if i != len(okruzenje) - 1:
-                        okruzenjeIspis += okruzenje[i] + ','
-                    else:
-                        okruzenjeIspis += okruzenje[i]
                 niz = stanje + '->.' + prijelaz + ',{' + okruzenjeIspis + '}'
             if(niz not in listaStanjaNKA):
                 listaStanjaNKA.append(niz)
@@ -211,8 +218,11 @@ def nadiZnak(prijelaz):
         return prijelaz[tocka+1:i]
     
 def pretvori(prijelaz):
-    #print '-------------------a'
+    ##print '-------------------a'
     #print prijelaziEpsilonNKA
+    #print prijelaz
+    #print '----------------------------------------------------'
+    #sleep(1.0)
     #print prijelaz
     tocka = nadiTocku(prijelaz)
     if(prijelaz[tocka+1] == '<'):
@@ -328,7 +338,7 @@ listaStanjaNKA.append(pomStanje)
 
 #print prijelaziEpsilonNKA
 #sys.exit(0)
-
+#print pomStanje
 pretvori(pomStanje)
 #for i in prijelaziEpsilonNKA['<%>']['$']:
 #    pretvori(i)
@@ -610,10 +620,18 @@ for stanja in prijelaziDKA:
                         Akcija[novi][znak] = 'Reduciraj(' + str(pom) + ')'
 #print len(prijelaziDKA)
 #print preimenuj
-pomStanje = '[<%>->' + pocetniNezavrsni + '.,{#}]'
-tmp = preimenuj[niz]
+pomStanje = '<%>->' + pocetniNezavrsni + '.,{#}'
+#print pomStanje
+#print '-------------'
+for stanja in preimenuj:
+    tp = stanja[1:len(stanja)-1]
+    tp = tp.split('|')
+    if pomStanje in tp:
+        pomStanje = stanja
+        break
+tmp = preimenuj[pomStanje]
 Akcija[tmp]['#'] = 'Prihvati()'
-print Akcija
+#print Akcija
 
 NovoStanje = {}
 for stanja in prijelaziDKA:
@@ -624,11 +642,20 @@ for stanja in prijelaziDKA:
             pom = preimenuj[prijelaziDKA[stanja][znak]]
             NovoStanje[novi][znak] = 'Stavi(' + str(pom) + ')'
 
-print '-----------------------'         
-print NovoStanje
+#print '-----------------------'         
+#print NovoStanje
 
+#path = "./analizator"
+#completeName = os.path.join(path, "izlaz.txt")
+#f = open(completeName,'w')
 f = open("izlaz.txt", 'w')
-f.write('%A\n')
+for i in range(0, len(sinkroZnakovi)):
+    if i == 0:
+        f.write(sinkroZnakovi[i])
+    else:
+        f.write(',' + sinkroZnakovi[i])
+
+f.write('\n%A\n')
 for stanje in Akcija:
     f.write(str(stanje) + '\n')
     for znak in Akcija[stanje]:
@@ -641,5 +668,11 @@ for stanje in NovoStanje:
     for znak in NovoStanje[stanje]:
         f.write(' ' + znak + '\n')
         f.write(' ' + NovoStanje[stanje][znak] + '\n')
-        
-print len(prijelaziDKA)
+      
+"""print len(prijelaziDKA)
+print len(listaStanjaNKA)
+for stanje in preimenuj:
+    if preimenuj[stanje] == 0:
+        print stanje
+        print preimenuj[stanje]
+        print '------------------------------'"""
