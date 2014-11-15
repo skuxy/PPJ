@@ -631,7 +631,12 @@ for stanja in preimenuj:
         break
 tmp = preimenuj[pomStanje]
 Akcija[tmp]['#'] = 'Prihvati()'
+<<<<<<< HEAD
 #print Akcija
+=======
+for slot in Akcija.iteritems():
+	print slot
+>>>>>>> 7d546e70fad69ed4e8193211d9e450694186a1ef
 
 NovoStanje = {}
 for stanja in prijelaziDKA:
@@ -642,8 +647,14 @@ for stanja in prijelaziDKA:
             pom = preimenuj[prijelaziDKA[stanja][znak]]
             NovoStanje[novi][znak] = 'Stavi(' + str(pom) + ')'
 
+<<<<<<< HEAD
 #print '-----------------------'         
 #print NovoStanje
+=======
+print '-----------------------'         
+for kejos in NovoStanje.iteritems():
+	print kejos
+>>>>>>> 7d546e70fad69ed4e8193211d9e450694186a1ef
 
 #path = "./analizator"
 #completeName = os.path.join(path, "izlaz.txt")
@@ -668,6 +679,7 @@ for stanje in NovoStanje:
     for znak in NovoStanje[stanje]:
         f.write(' ' + znak + '\n')
         f.write(' ' + NovoStanje[stanje][znak] + '\n')
+<<<<<<< HEAD
       
 """print len(prijelaziDKA)
 print len(listaStanjaNKA)
@@ -676,3 +688,7 @@ for stanje in preimenuj:
         print stanje
         print preimenuj[stanje]
         print '------------------------------'"""
+=======
+        
+print len(prijelaziDKA)
+>>>>>>> 7d546e70fad69ed4e8193211d9e450694186a1ef
