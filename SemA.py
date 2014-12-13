@@ -160,7 +160,7 @@ def pretvorbaDopustena(iz, u):
     if(iz.tip == "VOID" or u.tip == "VOID"):
         return False
     if(u.tip == "INT"):
-        if((iz.tip == "INT" or iz.tip == "CHAR")): #and iz.jeNiz == False and iz.parametri == 0):
+        if((iz.tip == "INT" or iz.tip == "CHAR") and iz.jeNiz == u.jeNiz): # and iz.parametri == 0):
             return True
         else:
             return False
@@ -324,7 +324,7 @@ def postfiks_izraz(cvor):
         cvor.listaDjece[0] = dijete
         cvor.tip = dijete.tip
         cvor.l_izraz = dijete.l_izraz
-        
+        print dijete.tip.tip
         
     elif(dijete.naziv == "<postfiks_izraz>"):
         dijete.tablica = cvor.tablica
@@ -335,6 +335,8 @@ def postfiks_izraz(cvor):
         if(dijete.naziv[0:13] == "L_UGL_ZAGRADA"):
             #??? 2. korak
             dijete = cvor.listaDjece[0]
+            if(dijete.tip.jeNiz != True):
+                ispisiGresku(cvor)
             dijete.tip = Tip(dijete.tip.tip, True, dijete.tip.jeKonst, 0)
             cvor.listaDjece[0] = dijete
             
@@ -350,9 +352,9 @@ def postfiks_izraz(cvor):
                 dijete = cvor.listaDjece[0]
                 cvor.tip = Tip(dijete.tip.tip, False, dijete.tip.jeKonst, 0)
                 if(dijete.tip.jeKonst == True):
-                    cvor.l_izraz = 1
-                else:
                     cvor.l_izraz = 0
+                else:
+                    cvor.l_izraz = 1
             else:
                 ispisiGresku(cvor)
                 
@@ -372,11 +374,19 @@ def postfiks_izraz(cvor):
             cvor.listaDjece[2] = dijete
             #mora provjeriti paramtetre bla bal
             dijete2 = cvor.listaDjece[0]
+            
+            """for x in cvor.listaDjece:
+                print '---'
+                print x.naziv"""
+            
+            print dijete.tipovi
+            if(len(dijete.tipovi) > len(dijete2.tip.parametri)):
+                ispisiGresku(cvor)
             for i in range(0, len(dijete.tipovi)):
-                if(not(pretvorbaDopustena(dijete.tipovi[i], dijete2.tip.paramtetri[i]))):
+                if(not(pretvorbaDopustena(dijete.tipovi[i], dijete2.tip.parametri[i]))):
                     ispisiGresku(cvor)
                 #provjeriti da li su implicitno isti kao argumenti
-            cvor.tip = (dijete2.tip.tip, dijete2.tip.jeNiz, dijete2.tip.jeKonst, dijete2.tip.paramtetri)
+            cvor.tip = Tip(dijete2.tip.tip, dijete2.tip.jeNiz, dijete2.tip.jeKonst, dijete2.tip.parametri)
             cvor.l_izraz = 0
                 
         elif(dijete.naziv == "OP_INC" or dijete.naziv == "OP_DEC"):
@@ -410,14 +420,15 @@ def lista_argumenata(cvor):
         
         for tip in dijete.tipovi:
             cvor.tipovi.append(tip)
-            
-        cvor.tipovi.append(dijete.tip)
+        
+        cvor.tipovi.append(dijete2.tip)
         
     return cvor
         
 def unarni_izraz(cvor):
     print 'unarni_izraz'
     dijete = cvor.listaDjece[0]
+    print dijete.naziv
     
     if(dijete.naziv == "<postfiks_izraz>"):
         dijete.tablica = cvor.tablica   
@@ -427,11 +438,12 @@ def unarni_izraz(cvor):
         cvor.tip = dijete.tip
         cvor.l_izraz = dijete.l_izraz
         
-    elif(dijete.naziv == "OP_INC" or dijete.naziv == "OP_DEC"):
+    elif(dijete.naziv[0:6] == "OP_INC" or dijete.naziv[0:6] == "OP_DEC"):
+        dijete = cvor.listaDjece[1]
         dijete.tablica = cvor.tablica
         dijete = unarni_izraz(dijete)
         dijete.l_izraz = 1 #? 2.korak
-        cvor.listaDjece[0] = dijete
+        cvor.listaDjece[1] = dijete
         
         #????
         if(not(dijete.tip.implicitnoINT())):
@@ -848,9 +860,12 @@ def izraz_pridruzivanja(cvor):
         dijete.tablica = cvor.tablica
         dijete = postfiks_izraz(dijete)
         
-        #?? drugi korak
-        dijete.l_izraz = 1
+        #?? drugi korak JAKO UPITNO
+        #dijete.l_izraz = 1 
         cvor.listaDjece[0] = dijete
+        print dijete.naziv
+        if(dijete.l_izraz != 1):
+            ispisiGresku(cvor)
             
         dijete = cvor.listaDjece[2]  
         dijete.tablica = cvor.tablica
@@ -858,7 +873,9 @@ def izraz_pridruzivanja(cvor):
         cvor.listaDjece[2] = dijete
         
         #???
-        if(not(dijete.tip.implicitnoINT())):
+        dijete2 = cvor.listaDjece[0]
+        if(not(pretvorbaDopustena(dijete.tip, dijete2.tip))):
+            print 'tu'
             ispisiGresku(cvor)
             
         cvor.tip = Tip("INT", False, False, 0)
@@ -927,7 +944,7 @@ def lista_naredbi(cvor):
         dijete = naredba(dijete)
         cvor.listaDjece[0] = dijete
         
-    elif(dijete.naredba == "<lista_naredbi"):
+    elif(dijete.naziv == "<lista_naredbi>"):
         dijete.tablica = cvor.tablica
         dijete = lista_naredbi(dijete)
         cvor.listaDjece[0] = dijete
@@ -1068,6 +1085,7 @@ def naredba_skoka(cvor):
             
             #??????
             #provjeriti nekako parametre
+            
             if(not(nadiFunkciju(dijete))):
                 ispisiGresku(cvor)
     return cvor
@@ -1162,7 +1180,6 @@ def definicija_funkcije(cvor):
     
     elif(cvor.listaDjece[3].naziv == "<lista_parametara>"):
         #4.korak
-        print 'yolo'
         dijete = cvor.listaDjece[3]
         dijete.tablica = cvor.tablica
         dijete = lista_parametara(dijete)
@@ -1217,7 +1234,7 @@ def lista_parametara(cvor):
         dijete2 = cvor.listaDjece[0]
         
         for ime in dijete2.imena:
-            if(dijete.naziv == ime):
+            if(dijete.ime == ime):
                 ispisiGresku(cvor)
         
         for tip in dijete2.tipovi:
@@ -1228,7 +1245,7 @@ def lista_parametara(cvor):
         for ime in dijete2.imena:
             cvor.imena.append(ime)
             
-        cvor.imena.append(dijete.naziv)
+        cvor.imena.append(dijete.ime)
         
     return cvor
 
@@ -1246,6 +1263,8 @@ def deklaracija_parametra(cvor):
     ime = dijete.naziv.split(" ")
     ime = ime[2]
     
+    print '+++++++++++'
+    print ime
     cvor.ime = ime
     dijete = cvor.listaDjece[0]
     if(len(cvor.listaDjece) == 2):
@@ -1287,6 +1306,8 @@ def deklaracija(cvor):
     dijete = cvor.listaDjece[1]
     dijete.tablica = cvor.tablica
     dijete.ntip = cvor.listaDjece[0].tip
+    print cvor.listaDjece[0].tip.tip
+    print '+++++'
     dijete = lista_init_deklaratora(dijete)
     print '-----------------'
     print cvor.listaDjece[0].tip
@@ -1306,16 +1327,18 @@ def lista_init_deklaratora(cvor):
         #dijete.ntip = cvor.ntip
         cvor.listaDjece[0] = dijete
     
-    elif(dijeta.naziv == "<lista_init_deklaratora>"):
+    elif(dijete.naziv == "<lista_init_deklaratora>"):
         dijete.tablica = cvor.tablica
-        dijete = lista_init_deklaratora(dijete)
         dijete.ntip = cvor.ntip
+        dijete = lista_init_deklaratora(dijete)
+        #dijete.ntip = cvor.ntip
         cvor.listaDjece[0] = dijete
         
         dijete = cvor.listaDjece[2]
         dijete.tablica = cvor.tablica
-        dijete = init_deklarator(dijete)
         dijete.ntip = cvor.ntip
+        dijete = init_deklarator(dijete)
+        #dijete.ntip = cvor.ntip
         cvor.listaDjece[2] = dijete
         
     return cvor
@@ -1331,10 +1354,13 @@ def init_deklarator(cvor):
     cvor.listaDjece[0] = dijete
     
     if(len(cvor.listaDjece) == 1):
+        #print dijete.tip.jeNiz
+        print dijete.tip
         if(dijete.tip.jeKonst):
             ispisiGresku(cvor)
-        if(dijete.tip.jeNiz):
-            ispisiGresku(cvor)
+        """if(dijete.tip.jeNiz):
+            print 'tu2'
+            ispisiGresku(cvor)"""
     elif(len(cvor.listaDjece) == 3):
         dijete = cvor.listaDjece[2]
         dijete.tablica = cvor.tablica
@@ -1379,6 +1405,8 @@ def izravni_deklarator(cvor):
         tip = cvor.ntip
         cvor.tablica.dodaj_u_tablicu(ime, tip) #???
         cvor.tip = cvor.ntip
+        print '----'
+        print cvor.ntip
     
     elif(dijete.naziv[0:4] == "BROJ"):
         if(cvor.ntip == "VOID"):
@@ -1395,7 +1423,8 @@ def izravni_deklarator(cvor):
         dijete = cvor.listaDjece[2]
         broj = dijete.naziv.split(" ")
         broj = broj[2]
-        if(broj <= 0 or broj > 1024):
+        
+        if(int(broj) <= 0 or int(broj) > 1024):
             ispisiGresku(cvor)
             
         tip = Tip(cvor.ntip.tip, True, cvor.ntip.jeKonst, cvor.ntip.parametri)
@@ -1473,6 +1502,8 @@ def inicijalizator(cvor):
         dijete = izraz_pridruzivanja(dijete)
         cvor.listaDjece[0] = dijete
         
+        print '---'
+        print dijete.naziv
         if(dijete.tip.jeNiz):
             ime = nadiString(dijete)
             cvor.br_elem = len(ime) + 1
