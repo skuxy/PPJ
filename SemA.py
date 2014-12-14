@@ -95,7 +95,6 @@ def jeChar(znak):
             return False
         val = znak[0]
     
-    print'xd'
     val = ord(val)
     if(val >= 0 and val <= 255):
         return True
@@ -114,7 +113,7 @@ def jeString(niz):
                 provjera = jeChar(niz[i] + niz[i+1])
                 i += 2
         else:
-            provjera = jeChar(niz[i+1])
+            provjera = jeChar(niz[i])
         i += 1
     
     return provjera
@@ -155,10 +154,13 @@ def deklariranoGlobalno(tablica, ime, tip):
             return -1
         
 def pretvorbaDopustena(iz, u):
+    print iz.tip
+    print u.tip
+    print 'fdsfsdfsdfs'
     if(iz.tip == None or u.tip == None):
         return False
-    if(iz.tip == "VOID" or u.tip == "VOID"):
-        return False
+    if(iz.tip == "VOID" and u.tip == "VOID"):
+        return True
     if(u.tip == "INT"):
         if((iz.tip == "INT" or iz.tip == "CHAR") and iz.jeNiz == u.jeNiz): # and iz.parametri == 0):
             return True
@@ -172,9 +174,9 @@ def pretvorbaDopustena(iz, u):
         
 def provjeriCast(iz, u):
     if(iz.tip == "INT" and u.tip == "CHAR"):
-        return True
+        return True or pretvorbaDopustena(iz, u)
     else:
-        return False
+        return False or pretvorbaDopustena(iz, u)
     
 def nadiFunkciju(cvor):
     pom = copy.copy(cvor)
@@ -247,7 +249,12 @@ def sveDeklarirane(tablica):
                         return False
     return True
         
-        
+def pronadiPetlju(cvor):
+    while(cvor.prethodni == None):
+        if(cvor.naziv == "<naredba_petlje>"):
+            return True
+        cvor = cvor.prethodni
+    return False
 #-----------------------------------------------------------------------
 
 def primarni_izraz(cvor):
@@ -294,8 +301,10 @@ def primarni_izraz(cvor):
             ispisiGresku(cvor)
         
     elif(dijete.naziv[0:11] == "NIZ_ZNAKOVA"):
+        print 'BLALALALALLALALALLA'
         niz = dijete.naziv.split(" ")
         niz = niz[2]
+        niz = niz[1:len(niz)-2]
         
         if(jeString(niz)):
             cvor.tip = Tip("STRING", True, True, 0)
@@ -477,7 +486,9 @@ def cast_izraz(cvor):
         
         cvor.tip = dijete.tip
         cvor.l_izraz = dijete.l_izraz
-    elif(dijete.naziv == "L_ZAGRADA"):
+        
+    elif(dijete.naziv[0:9] == "L_ZAGRADA"):
+        
         dijete = cvor.listaDjece[1]
         dijete.tablica = cvor.tablica
         dijete = ime_tipa(dijete)
@@ -485,11 +496,19 @@ def cast_izraz(cvor):
         
         dijete2 = cvor.listaDjece[3]
         dijete2.tablica = cvor.tablica
-        dijete2 = cast_izraz(dijete)
+        dijete2 = cast_izraz(dijete2)
         cvor.listaDjece[3] = dijete2
         
         #??? provjeriti castanje po pravilima
-        if(not(provjeriCast(dijete.tip, dijete2.tip))):
+        print dijete.tip.tip
+        print dijete.tip.jeNiz
+        print dijete.tip.jeKonst
+        print dijete2.tip.tip
+        print dijete2.tip.jeNiz
+        print dijete2.tip.jeKonst
+        print '+++++++++++++++'
+        if(not(provjeriCast(dijete2.tip, dijete.tip))):
+            print 'tu'
             ispisiGresku(cvor) #valjda?
         
         cvor.tip = dijete.tip
@@ -507,7 +526,7 @@ def ime_tipa(cvor):
         cvor.listaDjece[0] = dijete
         
         cvor.tip = dijete.tip
-    elif(dijete.naziv == "KR_CONST"):
+    elif(dijete.naziv[0:8] == "KR_CONST"):
         dijete = cvor.listaDjece[1]
         dijete.tablica = cvor.tablica
         dijete = specifikator_tipa(dijete)
@@ -1071,10 +1090,12 @@ def naredba_skoka(cvor):
     dijete = cvor.listaDjece[0]
     
     if(dijete.naziv[0:11] == "KR_CONTINUE" or dijete.naziv[0:8] == "KR_BREAK"):
-        print 'provjeri za petlju'
+        if(not(pronadiPetlju(cvor))):
+            ispisiGresku(cvor)
     elif(dijete.naziv[0:9] == "KR_RETURN"):
         dijete = cvor.listaDjece[1]
-        if(dijete.naziv == "TOCKAZAREZ"):
+        if(dijete.naziv[0:10] == "TOCKAZAREZ"):
+            dijete.tip = Tip("VOID", False, False, 0)
             if(not(nadiFunkciju(dijete))):
                 ispisiGresku(cvor)
                 
