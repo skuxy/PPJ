@@ -159,9 +159,9 @@ def deklariranoGlobalno(tablica, ime, tip):
             return -1
         
 def pretvorbaDopustena(iz, u):
-    print iz.tip
-    print u.tip
-    print 'fdsfsdfsdfs'
+   # print iz.tip
+   # print u.tip
+   # print 'fdsfsdfsdfs'
     if(iz.tip == None or u.tip == None):
         return False
     if(iz.tip == "VOID" and u.tip == "VOID"):
