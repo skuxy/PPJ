@@ -275,7 +275,10 @@ def pronadiPetlju(cvor):
 def provjeriPozvano(cvor):
     pom = copy.copy(cvor)
     while cvor.naziv != '<postfiks_izraz>':
-        cvor = cvor.listaDjece[0]
+        if(cvor.naziv == '<cast_izraz>' and len(cvor.listaDjece) == 4):
+            cvor = cvor.listaDjece[3]
+        else:
+            cvor = cvor.listaDjece[0]
         
     if(pom.tip.parametri[0].tip == "VOID"):
         if(len(cvor.listaDjece) != 3):
@@ -303,13 +306,17 @@ def primarni_izraz(cvor):
         dijete.tablica = cvor.tablica
         if(provjeriDeklarirano(dijete.tablica, ime)):
             #????
+            print 'PICKMA MATERINA'
+            print ime
             cvor.tip = vratiIdentifikator(dijete.tablica, ime)
             print cvor.tip
             if(cvor.tip == None):
                 for fun in listaDefiniranihFunkcija:
                     if fun.ime == ime:
                         cvor.tip = fun.tip
-                
+            print 'weeeeee'
+            print cvor.tip.tip
+            print cvor.tip.parametri
             cvor.l_izraz = 1 #GREKA
         else:
             ispisiGresku(cvor)
@@ -549,7 +556,8 @@ def cast_izraz(cvor):
             print 'tu'
             ispisiGresku(cvor) #valjda?
         
-        cvor.tip = dijete.tip
+        #cvor.tip = dijete.tip
+        cvor.tip = Tip(dijete.tip.tip, dijete.tip.jeNiz, dijete.tip.jeKonst, dijete2.tip.parametri)
         cvor.l_izraz = 0 
         
     return cvor
@@ -1056,6 +1064,10 @@ def izraz_naredba(cvor):
         dijete = izraz(dijete)
         cvor.listaDjece[0] = dijete
         
+        cvor.tip = dijete.tip
+        
+    return cvor
+        
 
 def naredba_grananja(cvor):
     print 'naredba_grananja'
@@ -1150,7 +1162,10 @@ def naredba_skoka(cvor):
             
             if(not(nadiFunkciju(dijete))):
                 ispisiGresku(cvor)
-                
+            
+            print '=================='
+            print dijete.tip.tip
+            print dijete.tip.parametri
             if(dijete.tip.parametri != 0):
                 if(not(provjeriPozvano(dijete))):
                     ispisiGresku(cvor)
