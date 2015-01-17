@@ -37,10 +37,6 @@ def return_value(val, broj=False):
 def dodaj_labelu_fije(labela):
 	stream.write("\n\nF_"+str(labela).upper())	
 
-
-			
-		
-
 def citaj_listove(lista):
 	
 	#milijarde flagova
@@ -67,10 +63,8 @@ def citaj_listove(lista):
 	
 	
 	for clan in lista:
-		print str(negativan)
 		trenutni=0
 		name = clan.naziv.split(" ")
-		print name[2]
 		if name[0] == "KR_INT":
 			if clan.prethodni.prethodni.prethodni.naziv=="<definicija_funkcije>":
 				je_funkcija = True
@@ -87,27 +81,32 @@ def citaj_listove(lista):
 			if negativan:
 				name[2]=int(name[2])*-1
 			if returnanje:
-				if not negativan:
-					stog_arg.append(int(name[2]))
-				else:
-					stog_arg.append(int(name[2])*-1)		
+				stog_arg.append(int(name[2]))	
 			if globalna:
 				lista_glob_konstanti.append(int(name[2]))	
 				
 		
-			
+		elif name[0] == "MINUS":
+			#print "je"
+			oduzimanje = True
+			zbrajanje=False
+			if clan.prethodni.naziv=="<unarni_operator>":
+				#print "aha"
+				if negativan:
+					negativan = False
+				elif negativan == False:
+					#print "je"
+					negativan = True			
 										
 		
 		elif name[0] == "IDN":
-			if name[2] in lista_fija:
-				je_funkcija = True
 			if je_funkcija and not u_tijelu_fije:
 				dodaj_labelu_fije(name[2])
 				lista_fija.append(name[2])
 				zadnja_fija = name[2]
-			elif je_funkcija and u_tijelu_fije:
-				stream.write("\tCALL F_"+str(name[2].upper())+"\n")
-				
+			
+			if name[2] in lista_fija:
+				je_funkcija = True
 			elif navodenje_argumenata:
 				broj_argumenata += 1 #Hm? Hm!
 			elif je_deklaracija_var:
@@ -177,8 +176,6 @@ def citaj_listove(lista):
 			binarno_ili=False	
 			binarno_i=False
 			globalna = False #Hm? jesam li zaribao? ------nisam!
-		
-				
 			if returnanje and not je_operacija and stog_arg:
 				reza = stog_arg.pop()
 				if negativan:
@@ -192,21 +189,11 @@ def citaj_listove(lista):
 			if je_operacija and returnanje:
 				stream.write("\tMOVE R"+str(trenutni)+", R6\n")
 				stream.write("\tRET\n")
-			if returnanje and not je_operacija:
-				stream.write("\tRET\n")	
 			je_operacija = False	
-			returnanje = False
+		
 		
 		elif name[0] == "PLUS":
-			zbrajanje = True	
-			
-		elif name[0] == "MINUS":
-			oduzimanje = True
-			if clan.prethodni.naziv=="<unarni_operator>":
-				if negativan:
-					negativan = False
-				elif negativan == False:
-					negativan = True					
+			zbrajanje = True			
 			
 		elif name[0] == "OP_BIN_ILI":
 			binarno_ili=True
@@ -255,4 +242,3 @@ for i in range(len(lista_glob_konstanti)):
 	
 #print lista_glob_konstanti
 #print lista_globalnih_var
-
