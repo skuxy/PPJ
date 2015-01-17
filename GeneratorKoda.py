@@ -67,6 +67,7 @@ def citaj_listove(lista):
 	
 	
 	for clan in lista:
+		print str(negativan)
 		trenutni=0
 		name = clan.naziv.split(" ")
 		print name[2]
@@ -86,7 +87,10 @@ def citaj_listove(lista):
 			if negativan:
 				name[2]=int(name[2])*-1
 			if returnanje:
-				stog_arg.append(int(name[2]))	
+				if not negativan:
+					stog_arg.append(int(name[2]))
+				else:
+					stog_arg.append(int(name[2])*-1)		
 			if globalna:
 				lista_glob_konstanti.append(int(name[2]))	
 				
@@ -173,6 +177,8 @@ def citaj_listove(lista):
 			binarno_ili=False	
 			binarno_i=False
 			globalna = False #Hm? jesam li zaribao? ------nisam!
+		
+				
 			if returnanje and not je_operacija and stog_arg:
 				reza = stog_arg.pop()
 				if negativan:
