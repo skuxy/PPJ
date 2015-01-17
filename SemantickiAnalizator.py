@@ -11,7 +11,7 @@ class Tip():
         self.parametri = parametri
         
     def implicitnoINT(self):
-        if((self.tip == "INT" or self.tip == "CHAR") and (self.jeNiz == False) and (self.parametri == 0)):
+        if((self.tip == "INT" or self.tip == "CHAR") and (self.jeNiz == False)):
             return True
         else:
             return False
